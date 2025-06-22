@@ -53,6 +53,8 @@ func NewStore(d database.Dialect) (Store, error) {
 	switch d {
 	case database.DialectPostgres:
 		querier = dialects.NewPostgres()
+	case database.DialectOracle:
+		querier = dialects.NewOracle()
 	case database.DialectMySQL:
 		querier = dialects.NewMysql()
 	case database.DialectSQLite3:

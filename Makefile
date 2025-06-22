@@ -83,6 +83,9 @@ test-clickhouse: add-gowork
 test-mysql: add-gowork
 	go test $(GO_TEST_FLAGS) ./internal/testing/integration -run='TestMySQL' | tparse --follow -sort=elapsed
 
+test-oracle: add-gowork
+	go test $(GO_TEST_FLAGS) ./internal/testing/integration -run='TestOracle' | tparse --follow -sort=elapsed
+
 test-turso: add-gowork
 	go test $(GO_TEST_FLAGS) ./internal/testing/integration -run='TestTurso' | tparse --follow -sort=elapsed
 
@@ -125,6 +128,16 @@ docker-mysql:
 		-l goose_test \
 		mysql:8.0.31
 	echo "mysql://$(DB_USER):$(DB_PASSWORD)@localhost:$(DB_MYSQL_PORT)/$(DB_NAME)?parseTime=true"
+
+docker-oracle:
+	docker run --rm -d \
+		-e ORACLE_PASSWORD=rootpassword1 \
+		-e APP_USER=$(DB_USER) \
+		-e APP_USER_PASSWORD=$(DB_PASSWORD) \
+		-p $(DB_ORACLE_PORT):1521 \
+		-l goose_test \
+		gvenzl/oracle-free:23
+	echo "oracle://$(DB_USER):$(DB_PASSWORD)@localhost:$(DB_ORACLE_PORT)/$(DB_NAME)"
 
 docker-clickhouse:
 	docker run --rm -d \

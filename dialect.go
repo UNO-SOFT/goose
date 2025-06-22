@@ -15,6 +15,7 @@ const (
 	DialectClickHouse Dialect = database.DialectClickHouse
 	DialectMSSQL      Dialect = database.DialectMSSQL
 	DialectMySQL      Dialect = database.DialectMySQL
+	DialectOracle     Dialect = database.DialectOracle
 	DialectPostgres   Dialect = database.DialectPostgres
 	DialectRedshift   Dialect = database.DialectRedshift
 	DialectSQLite3    Dialect = database.DialectSQLite3
@@ -26,7 +27,7 @@ const (
 )
 
 func init() {
-	store, _ = legacystore.NewStore(DialectPostgres)
+	store, _ = legacystore.NewStore(DialectOracle)
 }
 
 var store legacystore.Store
@@ -39,6 +40,8 @@ func SetDialect(s string) error {
 		d = DialectPostgres
 	case "mysql":
 		d = DialectMySQL
+	case "oracle", "godror":
+		d = DialectOracle
 	case "sqlite3", "sqlite":
 		d = DialectSQLite3
 	case "mssql", "azuresql", "sqlserver":

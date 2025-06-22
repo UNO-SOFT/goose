@@ -23,6 +23,8 @@ func OpenDBWithDriver(driver string, dbstring string) (*sql.DB, error) {
 	// need for mapping dialects to drivers, rendering this function unnecessary.
 
 	switch driver {
+	case "oracle":
+		driver = "godror"
 	case "mssql":
 		driver = "sqlserver"
 	case "tidb":
@@ -38,7 +40,7 @@ func OpenDBWithDriver(driver string, dbstring string) (*sql.DB, error) {
 	}
 
 	switch driver {
-	case "postgres", "pgx", "sqlite3", "sqlite", "mysql", "sqlserver", "clickhouse", "vertica", "azuresql", "ydb", "libsql", "starrocks":
+	case "postgres", "pgx", "oracle", "godror", "sqlite3", "sqlite", "mysql", "sqlserver", "clickhouse", "vertica", "azuresql", "ydb", "libsql", "starrocks":
 		return sql.Open(driver, dbstring)
 	default:
 		return nil, fmt.Errorf("unsupported driver %s", driver)
