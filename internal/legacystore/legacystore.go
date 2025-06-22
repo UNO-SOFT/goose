@@ -100,30 +100,45 @@ var _ Store = (*store)(nil)
 func (s *store) CreateVersionTable(ctx context.Context, tx *sql.Tx, tableName string) error {
 	q := s.querier.CreateTable(tableName)
 	_, err := tx.ExecContext(ctx, q)
+	if err != nil {
+		err = fmt.Errorf("%s: %w", q, err)
+	}
 	return err
 }
 
 func (s *store) InsertVersion(ctx context.Context, tx *sql.Tx, tableName string, version int64) error {
 	q := s.querier.InsertVersion(tableName)
 	_, err := tx.ExecContext(ctx, q, version, true)
+	if err != nil {
+		err = fmt.Errorf("%s: %w", q, err)
+	}
 	return err
 }
 
 func (s *store) InsertVersionNoTx(ctx context.Context, db *sql.DB, tableName string, version int64) error {
 	q := s.querier.InsertVersion(tableName)
 	_, err := db.ExecContext(ctx, q, version, true)
+	if err != nil {
+		err = fmt.Errorf("%s: %w", q, err)
+	}
 	return err
 }
 
 func (s *store) DeleteVersion(ctx context.Context, tx *sql.Tx, tableName string, version int64) error {
 	q := s.querier.DeleteVersion(tableName)
 	_, err := tx.ExecContext(ctx, q, version)
+	if err != nil {
+		err = fmt.Errorf("%s: %w", q, err)
+	}
 	return err
 }
 
 func (s *store) DeleteVersionNoTx(ctx context.Context, db *sql.DB, tableName string, version int64) error {
 	q := s.querier.DeleteVersion(tableName)
 	_, err := db.ExecContext(ctx, q, version)
+	if err != nil {
+		err = fmt.Errorf("%s: %w", q, err)
+	}
 	return err
 }
 
@@ -138,7 +153,7 @@ func (s *store) GetMigration(
 	var isApplied bool
 	err := db.QueryRowContext(ctx, q, version).Scan(&timestamp, &isApplied)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", q, err)
 	}
 	return &GetMigrationResult{
 		IsApplied: isApplied,
@@ -150,7 +165,7 @@ func (s *store) ListMigrations(ctx context.Context, db *sql.DB, tableName string
 	q := s.querier.ListMigrations(tableName)
 	rows, err := db.QueryContext(ctx, q)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", q, err)
 	}
 	defer rows.Close()
 

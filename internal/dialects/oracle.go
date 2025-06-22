@@ -17,10 +17,10 @@ var _ dialect.QuerierExtender = (*oracle)(nil)
 
 func (p *oracle) CreateTable(tableName string) string {
 	q := `CREATE TABLE %s (
-		id integer(18) GENERATED ALWAYS as IDENTITY(START with 1 INCREMENT by 1),
-		version_id INTEGER(18) NOT NULL,
+		id NUMBER(18) GENERATED ALWAYS as IDENTITY(START with 1 INCREMENT by 1 MINVALUE 1 MAXVALUE 999999999999999999),
+		version_id NUMBER(18) NOT NULL,
 		is_applied CHAR(1) NOT NULL,
-		tstamp timestamp NOT NULL DEFAULT now()
+		tstamp timestamp DEFAULT SYSTIMESTAMP
 	)`
 	return fmt.Sprintf(q, tableName)
 }
@@ -53,9 +53,9 @@ func (p *oracle) GetLatestVersion(tableName string) string {
 func (p *oracle) TableExists(tableName string) string {
 	schemaName, tableName := parseTableIdentifier(tableName)
 	if schemaName != "" {
-		q := `SELECT COUNT(0) FROM DUAL WHERE EXISTS ( SELECT 1 FROM pg_tables WHERE schemaname = '%s' AND tablename = '%s' )`
+		q := `SELECT 1 FROM all_tables WHERE schemaname = '%s' AND tablename = '%s'`
 		return fmt.Sprintf(q, schemaName, tableName)
 	}
-	q := `SELECT COUNT(0) FROM DUAL WHERE EXISTS ( SELECT 1 FROM pg_tables WHERE (current_schema() IS NULL OR schemaname = current_schema()) AND tablename = '%s' )`
+	q := `SELECT 1 FROM user_tables WHERE tablename = '%s'`
 	return fmt.Sprintf(q, tableName)
 }
